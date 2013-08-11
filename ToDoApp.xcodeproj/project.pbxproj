@@ -21,6 +21,9 @@
 		FF58450B17B7945800276555 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FF5844EC17B7945800276555 /* Foundation.framework */; };
 		FF58451317B7945800276555 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = FF58451117B7945800276555 /* InfoPlist.strings */; };
 		FF58451617B7945800276555 /* ToDoAppTests.m in Sources */ = {isa = PBXBuildFile; fileRef = FF58451517B7945800276555 /* ToDoAppTests.m */; };
+		FF58452117B7959600276555 /* ToDoTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = FF58452017B7959600276555 /* ToDoTableViewController.m */; };
+		FF58452417B796D900276555 /* CustomCell.m in Sources */ = {isa = PBXBuildFile; fileRef = FF58452317B796D900276555 /* CustomCell.m */; };
+		FF58452617B796F200276555 /* CustomCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = FF58452517B796F200276555 /* CustomCell.xib */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -53,6 +56,11 @@
 		FF58451217B7945800276555 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		FF58451417B7945800276555 /* ToDoAppTests.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ToDoAppTests.h; sourceTree = "<group>"; };
 		FF58451517B7945800276555 /* ToDoAppTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ToDoAppTests.m; sourceTree = "<group>"; };
+		FF58451F17B7959600276555 /* ToDoTableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ToDoTableViewController.h; sourceTree = "<group>"; };
+		FF58452017B7959600276555 /* ToDoTableViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ToDoTableViewController.m; sourceTree = "<group>"; };
+		FF58452217B796D900276555 /* CustomCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CustomCell.h; sourceTree = "<group>"; };
+		FF58452317B796D900276555 /* CustomCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CustomCell.m; sourceTree = "<group>"; };
+		FF58452517B796F200276555 /* CustomCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = CustomCell.xib; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -115,6 +123,11 @@
 				FF5844F917B7945800276555 /* AppDelegate.h */,
 				FF5844FA17B7945800276555 /* AppDelegate.m */,
 				FF5844F117B7945800276555 /* Supporting Files */,
+				FF58451F17B7959600276555 /* ToDoTableViewController.h */,
+				FF58452017B7959600276555 /* ToDoTableViewController.m */,
+				FF58452217B796D900276555 /* CustomCell.h */,
+				FF58452317B796D900276555 /* CustomCell.m */,
+				FF58452517B796F200276555 /* CustomCell.xib */,
 			);
 			path = ToDoApp;
 			sourceTree = "<group>";
@@ -227,6 +240,7 @@
 				FF5844FD17B7945800276555 /* Default.png in Resources */,
 				FF5844FF17B7945800276555 /* Default@2x.png in Resources */,
 				FF58450117B7945800276555 /* Default-568h@2x.png in Resources */,
+				FF58452617B796F200276555 /* CustomCell.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -263,6 +277,8 @@
 			files = (
 				FF5844F717B7945800276555 /* main.m in Sources */,
 				FF5844FB17B7945800276555 /* AppDelegate.m in Sources */,
+				FF58452117B7959600276555 /* ToDoTableViewController.m in Sources */,
+				FF58452417B796D900276555 /* CustomCell.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -435,6 +451,7 @@
 				FF58451B17B7945800276555 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		FF58451C17B7945800276555 /* Build configuration list for PBXNativeTarget "ToDoAppTests" */ = {
 			isa = XCConfigurationList;
@@ -443,6 +460,7 @@
 				FF58451E17B7945800276555 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

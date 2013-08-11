@@ -1,5 +1,5 @@
 //
-//  AppDelegate.h
+//  ToDoTableViewController.h
 //  ToDoApp
 //
 //  Created by Rohit Dialani on 11/08/13.
@@ -8,8 +8,6 @@
 
 #import <UIKit/UIKit.h>
 
-@interface AppDelegate : UIResponder <UIApplicationDelegate>
-
-@property (strong, nonatomic) UIWindow *window;
+@interface ToDoTableViewController : UITableViewController
 
 @end
