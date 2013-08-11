@@ -10,5 +10,5 @@
 
 @interface CustomCell : UITableViewCell
 
-@property (nonatomic, weak) IBOutlet UILabel *toDoItem;
+@property (nonatomic, weak) IBOutlet UITextField *toDoItem;
 @end
