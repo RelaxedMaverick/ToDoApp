@@ -37,6 +37,8 @@
 
     UINib *nibCustom = [UINib nibWithNibName:@"CustomCell" bundle:nil];
     [self.tableView registerNib:nibCustom forCellReuseIdentifier:@"CustomCellId"];
+    self.tableView.delegate = self;
+    self.tableView.dataSource = self;
     
     self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAdd target:self action: @selector(onAddItemClicked)];
     
@@ -44,7 +46,6 @@
     
     self.doneBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action: @selector(onDoneItemClicked)];
     
-
     self.navigationItem.leftBarButtonItem = self.editBarButtonItem;
     // Uncomment the following line to preserve selection between presentations.
     // self.clearsSelectionOnViewWillAppear = NO;
@@ -61,13 +62,12 @@
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
 {
-    // Return the number of sections.
+    // hardcoded 1 section table view
     return 1;
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
-    // Return the number of rows in the section.
     return self.toDoItemsArray.count;
 }
 
@@ -79,26 +79,22 @@
     // Configure the cell...
     cell.toDoItem.text = [self.toDoItemsArray objectAtIndex:indexPath.row];
     cell.toDoItem.delegate = self;
-    cell.showsReorderControl = YES;
 
     return cell;
 }
 
-
 // Override to support conditional editing of the table view.
 - (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    // Return NO if you do not want the specified item to be editable.
     return YES;
 }
-
-
 
 // Override to support editing the table view.
 - (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath
 {
     if (editingStyle == UITableViewCellEditingStyleDelete) {
         // Delete the row from the data source
+        [self.toDoItemsArray removeObjectAtIndex:indexPath.row];
         [tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationFade];
     }   
     else if (editingStyle == UITableViewCellEditingStyleInsert) {
@@ -106,33 +102,38 @@
     }   
 }
 
+// Override to support conditional rearranging of the table view.
+- (BOOL)tableView:(UITableView *)tableView canMoveRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    return YES;
+}
 
 // Override to support rearranging the table view.
 - (void)tableView:(UITableView *)tableView moveRowAtIndexPath:(NSIndexPath *)fromIndexPath toIndexPath:(NSIndexPath *)toIndexPath
 {
+    // Backup the item moved and remove/insert it again in our data source
+    NSString *itemString = [self.toDoItemsArray objectAtIndex:fromIndexPath.row];
+    [self.toDoItemsArray removeObjectAtIndex:fromIndexPath.row];
+    [self.toDoItemsArray insertObject:itemString atIndex:toIndexPath.row];
 }
-
-
-
-// Override to support conditional rearranging of the table view.
-- (BOOL)tableView:(UITableView *)tableView canMoveRowAtIndexPath:(NSIndexPath *)indexPath
-{
-    // Return NO if you do not want the item to be re-orderable.
-    return YES;
-}
-
 
 #pragma mark - Table view delegate
 
-- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
+// Updating UI buttons since tableView enters/exits Editing mode via Swipe
+- (void)tableView:(UITableView *)tableView willBeginEditingRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    // Navigation logic may go here. Create and push another view controller.
-    /*
-     <#DetailViewController#> *detailViewController = [[<#DetailViewController#> alloc] initWithNibName:@"<#Nib name#>" bundle:nil];
-     // ...
-     // Pass the selected object to the new view controller.
-     [self.navigationController pushViewController:detailViewController animated:YES];
-     */
+    self.navigationItem.leftBarButtonItem = self.doneBarButtonItem;   
+}
+
+- (void)tableView:(UITableView *)tableView didEndEditingRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    self.navigationItem.leftBarButtonItem = self.editBarButtonItem;
+}
+
+// Playing with a trivial method
+- (NSString *)tableView:(UITableView *)tableView titleForDeleteConfirmationButtonForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    return @"delete";
 }
 
 # pragma mark UITextFieldDelegate method
@@ -142,7 +143,7 @@
     if (self.isAddingNewItem)
         return YES;
     else
-        return FALSE;
+        return NO;
 }
 
 - (void)textFieldDidBeginEditing:(UITextField *)textField
@@ -154,8 +155,10 @@
 
 - (void) onAddItemClicked
 {
-    self.isAddingNewItem = TRUE;
-    NSString *newItem = @"Insert new Item ..";
+    self.isAddingNewItem = YES;
+    static int i = 0;
+    NSString *newItem = [NSString stringWithFormat:@"Insert new Item %d..", i];
+    i++;
     // Always inserting at 0 since the Array shifts it the index is occupied
     [self.toDoItemsArray insertObject:newItem atIndex:0];
     
@@ -165,17 +168,14 @@
 
 - (void) onEditItemClicked
 {
-    NSIndexPath *indexPath = [self.tableView indexPathForSelectedRow];
-    if (indexPath == nil || indexPath.row >= self.toDoItemsArray.count)
-        return;
-    
     self.navigationItem.leftBarButtonItem = self.doneBarButtonItem;
+    self.tableView.editing = YES;
 }
 
 - (void) onDoneItemClicked
 {
     self.navigationItem.leftBarButtonItem = self.editBarButtonItem;
+    self.tableView.editing = NO;
 }
-
 
 @end
