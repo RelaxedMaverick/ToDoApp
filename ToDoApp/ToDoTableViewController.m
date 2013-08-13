@@ -15,7 +15,7 @@
 @property (nonatomic, strong) NSMutableArray *toDoItemsArray;
 @property (nonatomic, strong) UIBarButtonItem *editBarButtonItem;
 @property (nonatomic, strong) UIBarButtonItem *doneBarButtonItem;
-@property (nonatomic, assign) BOOL isAddingNewItem;
+@property (nonatomic, assign) BOOL inEditingCellMode;
 
 @end
 
@@ -37,6 +37,8 @@
 
     UINib *nibCustom = [UINib nibWithNibName:@"CustomCell" bundle:nil];
     [self.tableView registerNib:nibCustom forCellReuseIdentifier:@"CustomCellId"];
+
+    // Looks like delegate is automatically set. Still no harm in setting the same ?
     self.tableView.delegate = self;
     self.tableView.dataSource = self;
     
@@ -47,15 +49,12 @@
     self.doneBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action: @selector(onDoneItemClicked)];
     
     self.navigationItem.leftBarButtonItem = self.editBarButtonItem;
-    // Uncomment the following line to preserve selection between presentations.
-    // self.clearsSelectionOnViewWillAppear = NO;
  
 }
 
 - (void)didReceiveMemoryWarning
 {
     [super didReceiveMemoryWarning];
-    // Dispose of any resources that can be recreated.
 }
 
 #pragma mark - Table view data source
@@ -79,6 +78,7 @@
     // Configure the cell...
     cell.toDoItem.text = [self.toDoItemsArray objectAtIndex:indexPath.row];
     cell.toDoItem.delegate = self;
+    cell.toDoItem.tag = indexPath.row; // Tagging the textField with row Id
 
     return cell;
 }
@@ -96,9 +96,9 @@
         // Delete the row from the data source
         [self.toDoItemsArray removeObjectAtIndex:indexPath.row];
         [tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationFade];
-    }   
-    else if (editingStyle == UITableViewCellEditingStyleInsert) {
-        // Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view
+        
+        // Reloading tableView since am relying on the tag stored with each cell's TextField
+        [self.tableView reloadData];
     }   
 }
 
@@ -115,6 +115,9 @@
     NSString *itemString = [self.toDoItemsArray objectAtIndex:fromIndexPath.row];
     [self.toDoItemsArray removeObjectAtIndex:fromIndexPath.row];
     [self.toDoItemsArray insertObject:itemString atIndex:toIndexPath.row];
+    
+    // Reloading tableView since am relying on the tag stored with each cell's TextField
+    [self.tableView reloadData];
 }
 
 #pragma mark - Table view delegate
@@ -122,6 +125,7 @@
 // Updating UI buttons since tableView enters/exits Editing mode via Swipe
 - (void)tableView:(UITableView *)tableView willBeginEditingRowAtIndexPath:(NSIndexPath *)indexPath
 {
+    [self.view endEditing:YES];
     self.navigationItem.leftBarButtonItem = self.doneBarButtonItem;   
 }
 
@@ -133,33 +137,53 @@
 // Playing with a trivial method
 - (NSString *)tableView:(UITableView *)tableView titleForDeleteConfirmationButtonForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    return @"delete";
+    return @"Del";
 }
 
 # pragma mark UITextFieldDelegate method
 
 - (BOOL)textFieldShouldBeginEditing:(UITextField *)textField
 {
-    if (self.isAddingNewItem)
-        return YES;
-    else
+    // Preventing Editing of Cell content when table view is in Edit mode
+    if (self.tableView.editing)
         return NO;
+    
+    self.inEditingCellMode = YES;
+    return YES;
 }
 
-- (void)textFieldDidBeginEditing:(UITextField *)textField
+- (void)textFieldDidEndEditing:(UITextField *)textField
 {
-    NSLog(@"Editing");
+    // Updating the data source with new data
+    NSInteger rowIndex = textField.tag;
+    NSString *newItem = textField.text;
+    NSIndexPath *pathOfUpdatedRow = [NSIndexPath indexPathForRow:rowIndex inSection:0];
+    [self.toDoItemsArray replaceObjectAtIndex:rowIndex withObject:newItem];
+    
+    // Calling tableView update on the specific table row
+    [self.tableView reloadRowsAtIndexPaths:[NSArray arrayWithObject:pathOfUpdatedRow] withRowAnimation:UITableViewRowAnimationFade];
+    
+    self.inEditingCellMode = NO;
+}
+
+- (BOOL)textFieldShouldReturn:(UITextField *)textField
+{
+    // Getting rid of the keypad
+    [self.view endEditing:YES];
+    self.inEditingCellMode = NO;
+    return YES;
 }
 
 #pragma mark - App Logic
 
 - (void) onAddItemClicked
 {
-    self.isAddingNewItem = YES;
-    static int i = 0;
-    NSString *newItem = [NSString stringWithFormat:@"Insert new Item %d..", i];
-    i++;
-    // Always inserting at 0 since the Array shifts it the index is occupied
+    // Preventing new item addition while cell/tableview editing is in progress.
+    if (self.inEditingCellMode || self.tableView.editing)
+        return;
+    
+    NSString *newItem = @"";
+    // Always inserting at 0 since the Array shifts if the index is occupied
     [self.toDoItemsArray insertObject:newItem atIndex:0];
     
     [self.tableView reloadData];
@@ -168,6 +192,7 @@
 
 - (void) onEditItemClicked
 {
+    [self.view endEditing:YES];
     self.navigationItem.leftBarButtonItem = self.doneBarButtonItem;
     self.tableView.editing = YES;
 }
