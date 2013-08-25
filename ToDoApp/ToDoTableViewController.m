@@ -10,6 +10,8 @@
 #import "CustomCell.h"
 #import <QuartzCore/QuartzCore.h>
 
+static NSString * const kTodoList = @"kTodoList";
+
 @interface ToDoTableViewController ()
 
 @property (nonatomic, strong) NSMutableArray *toDoItemsArray;
@@ -26,7 +28,8 @@
     self = [super initWithStyle:style];
     if (self) {
         self.title = @"To Do List";
-        self.toDoItemsArray = [NSMutableArray arrayWithCapacity:10];
+//        self.toDoItemsArray = [NSMutableArray arrayWithCapacity:10];
+        self.toDoItemsArray = [[NSUserDefaults standardUserDefaults] mutableArrayValueForKey:kTodoList];
     }
     return self;
 }
@@ -99,6 +102,7 @@
         
         // Reloading tableView since am relying on the tag stored with each cell's TextField
         [self.tableView reloadData];
+        [self persistList];
     }   
 }
 
@@ -118,6 +122,7 @@
     
     // Reloading tableView since am relying on the tag stored with each cell's TextField
     [self.tableView reloadData];
+    [self persistList];
 }
 
 #pragma mark - Table view delegate
@@ -164,6 +169,7 @@
     [self.tableView reloadRowsAtIndexPaths:[NSArray arrayWithObject:pathOfUpdatedRow] withRowAnimation:UITableViewRowAnimationFade];
     
     self.inEditingCellMode = NO;
+    [self persistList];
 }
 
 - (BOOL)textFieldShouldReturn:(UITextField *)textField
@@ -176,7 +182,7 @@
 
 #pragma mark - App Logic
 
-- (void) onAddItemClicked
+- (void)onAddItemClicked
 {
     // Preventing new item addition while cell/tableview editing is in progress.
     if (self.inEditingCellMode || self.tableView.editing)
@@ -187,20 +193,26 @@
     [self.toDoItemsArray insertObject:newItem atIndex:0];
     
     [self.tableView reloadData];
-    
+    [self persistList];
 }
 
-- (void) onEditItemClicked
+- (void)onEditItemClicked
 {
     [self.view endEditing:YES];
     self.navigationItem.leftBarButtonItem = self.doneBarButtonItem;
     self.tableView.editing = YES;
 }
 
-- (void) onDoneItemClicked
+- (void)onDoneItemClicked
 {
     self.navigationItem.leftBarButtonItem = self.editBarButtonItem;
     self.tableView.editing = NO;
+}
+
+- (void)persistList
+{
+    [[NSUserDefaults standardUserDefaults] setObject:self.toDoItemsArray forKey:kTodoList];
+    [[NSUserDefaults standardUserDefaults] synchronize];
 }
 
 @end
